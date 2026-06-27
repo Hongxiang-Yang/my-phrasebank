@@ -1,5 +1,8 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+@custom-variant eyecare (&:where(.eyecare, .eyecare *));
+
 :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;

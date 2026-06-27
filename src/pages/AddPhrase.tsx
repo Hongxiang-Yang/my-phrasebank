@@ -19,6 +19,9 @@ export function AddPhrase() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [generateError, setGenerateError] = useState('');
   
+  const [isNewCategory, setIsNewCategory] = useState(false);
+  const [newCategoryName, setNewCategoryName] = useState('');
+  
   const [isSaved, setIsSaved] = useState(false);
 
   useEffect(() => {
@@ -47,13 +50,14 @@ export function AddPhrase() {
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
-    if (!phrase || !chineseCategory) return;
+    const finalCategory = isNewCategory ? newCategoryName : chineseCategory;
+    if (!phrase || !finalCategory) return;
 
     const newPhrase: Phrase = {
       id: crypto.randomUUID(),
       phrase,
       definition: definition || undefined,
-      chineseCategory,
+      chineseCategory: finalCategory,
       chineseNote: chineseNote || undefined,
       usageType: usageType || undefined,
       tone: tone || undefined,
@@ -67,11 +71,11 @@ export function AddPhrase() {
     const existingPhrases = Storage.getPhrases();
     Storage.savePhrases([newPhrase, ...existingPhrases]);
 
-    if (settings && !settings.categories.some(c => c.nameZh === chineseCategory)) {
+    if (settings && !settings.categories.some(c => c.nameZh === finalCategory)) {
       const updatedSettings = { ...settings };
       updatedSettings.categories.push({
         id: crypto.randomUUID(),
-        nameZh: chineseCategory,
+        nameZh: finalCategory,
         order: updatedSettings.categories.length
       });
       Storage.saveSettings(updatedSettings);
@@ -85,6 +89,8 @@ export function AddPhrase() {
     setChineseNote('');
     setExamples([]);
     setScenarios([]);
+    setIsNewCategory(false);
+    setNewCategoryName('');
     
     setTimeout(() => setIsSaved(false), 3000);
   };
@@ -152,21 +158,52 @@ export function AddPhrase() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div>
               <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Chinese Category <span className="text-red-400">*</span></label>
-              <input 
-                required
-                list="category-list"
-                value={chineseCategory}
-                onChange={e => setChineseCategory(e.target.value)}
-                className="w-full px-4 py-3 bg-white/50 border border-gray-200 text-gray-800 text-sm rounded-xl focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all duration-200 hover:bg-white/80 outline-none"
-                placeholder="Select or type a new category"
-              />
-              <datalist id="category-list">
-                {settings.categories.map(cat => (
-                  <option key={cat.id} value={cat.nameZh} />
-                ))}
-              </datalist>
+              {!isNewCategory ? (
+                <select 
+                  required
+                  value={chineseCategory}
+                  onChange={e => {
+                    if (e.target.value === '___ADD_NEW___') {
+                      setIsNewCategory(true);
+                      setChineseCategory('');
+                    } else {
+                      setChineseCategory(e.target.value);
+                    }
+                  }}
+                  className="w-full px-4 py-3 bg-white/50 border border-gray-200 text-gray-800 text-sm rounded-xl focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all duration-200 hover:bg-white/80 outline-none appearance-none cursor-pointer"
+                >
+                  <option value="" disabled>Select a category...</option>
+                  {settings.categories.map(cat => (
+                    <option key={cat.id} value={cat.nameZh}>{cat.nameZh}</option>
+                  ))}
+                  <option value="___ADD_NEW___" className="font-bold text-indigo-600">+ Type a new category...</option>
+                </select>
+              ) : (
+                <div className="flex gap-2">
+                  <input 
+                    required
+                    autoFocus
+                    value={newCategoryName}
+                    onChange={e => setNewCategoryName(e.target.value)}
+                    className="w-full px-4 py-3 bg-white/50 border border-gray-200 text-gray-800 text-sm rounded-xl focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all duration-200 hover:bg-white/80 outline-none"
+                    placeholder="Type new category name..."
+                  />
+                  <button 
+                    type="button"
+                    onClick={() => {
+                      setIsNewCategory(false);
+                      setNewCategoryName('');
+                      if (settings.categories.length > 0) {
+                        setChineseCategory(settings.categories[0].nameZh);
+                      }
+                    }}
+                    className="px-4 py-3 bg-gray-100 text-gray-600 rounded-xl hover:bg-gray-200 font-medium text-sm transition-colors whitespace-nowrap border border-gray-200"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              )}
             </div>
-
             <div>
               <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Chinese Meaning Note (Optional)</label>
               <input 
