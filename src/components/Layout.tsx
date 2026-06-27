@@ -16,7 +16,7 @@ export function Layout() {
       {/* Sidebar for Desktop / Bottom Nav for Mobile */}
       <nav className="fixed bottom-0 w-full bg-white dark:bg-gray-800 eyecare:bg-[#f4ebd8] border-t border-gray-200 dark:border-gray-700 eyecare:border-[#e6d5b8] md:relative md:w-64 md:border-t-0 md:border-r flex md:flex-col justify-around md:justify-start z-10 transition-colors duration-300">
         <div className="hidden md:flex p-6 items-center gap-3 border-b border-gray-100 dark:border-gray-700 eyecare:border-[#e6d5b8]">
-          <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold">P</div>
+          <div className="w-8 h-8 bg-blue-600 dark:bg-indigo-600 eyecare:bg-[#8b5a2b] rounded-lg flex items-center justify-center text-white eyecare:text-[#f4ebd8] font-bold transition-colors">P</div>
           <h1 className="text-xl font-semibold tracking-tight text-gray-800 dark:text-gray-100 eyecare:text-[#433422] transition-colors">My Phrasebank</h1>
         </div>
         <div className="flex w-full justify-around md:flex-col md:p-4 md:gap-2">

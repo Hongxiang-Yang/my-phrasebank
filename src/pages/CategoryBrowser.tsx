@@ -1,13 +1,15 @@
 import { useState, useEffect } from 'react';
 import { Storage } from '../lib/storage';
 import type { Phrase, Settings } from '../types';
-import { Copy, ChevronDown, ChevronUp } from 'lucide-react';
+import { Copy, ChevronDown, ChevronUp, Trash2, Edit } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 export function CategoryBrowser() {
   const [settings, setSettings] = useState<Settings | null>(null);
   const [phrases, setPhrases] = useState<Phrase[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const s = Storage.getSettings();
@@ -24,6 +26,14 @@ export function CategoryBrowser() {
 
   const handleCopy = (text: string) => {
     navigator.clipboard.writeText(text);
+  };
+
+  const handleDelete = (id: string) => {
+    if (confirm('Are you sure you want to delete this phrase?')) {
+      const newPhrases = phrases.filter(p => p.id !== id);
+      Storage.savePhrases(newPhrases);
+      setPhrases(newPhrases);
+    }
   };
 
   return (
@@ -135,6 +145,21 @@ export function CategoryBrowser() {
                     </div>
                     
                     <div className="flex items-center gap-1 md:gap-2 shrink-0 bg-gray-50/80 dark:bg-gray-900/50 eyecare:bg-[#fbf8f1] p-1.5 rounded-xl border border-gray-100 dark:border-gray-700 eyecare:border-[#e6d5b8] transition-colors">
+                      <button 
+                        onClick={() => navigate(`/edit/${phrase.id}`)}
+                        className="p-2 text-gray-400 dark:text-gray-500 eyecare:text-[#8a7b66] hover:text-indigo-600 dark:hover:text-indigo-400 eyecare:hover:text-[#8b5a2b] rounded-lg hover:bg-white dark:hover:bg-gray-800 eyecare:hover:bg-[#f4ebd8] hover:shadow-sm transition-all duration-200 active:scale-95"
+                        title="Edit Phrase"
+                      >
+                        <Edit size={18} strokeWidth={2.5} />
+                      </button>
+                      <button 
+                        onClick={() => handleDelete(phrase.id)}
+                        className="p-2 text-gray-400 dark:text-gray-500 eyecare:text-[#8a7b66] hover:text-red-600 dark:hover:text-red-400 eyecare:hover:text-red-600 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/30 eyecare:hover:bg-[#f0d6d6] hover:shadow-sm transition-all duration-200 active:scale-95"
+                        title="Delete Phrase"
+                      >
+                        <Trash2 size={18} strokeWidth={2.5} />
+                      </button>
+                      <div className="w-[1px] h-6 bg-gray-200 dark:bg-gray-700 eyecare:bg-[#e6d5b8] mx-1 transition-colors"></div>
                       <button 
                         onClick={() => handleCopy(phrase.phrase)}
                         className="p-2 text-gray-400 dark:text-gray-500 eyecare:text-[#8a7b66] hover:text-indigo-600 dark:hover:text-indigo-400 eyecare:hover:text-[#8b5a2b] rounded-lg hover:bg-white dark:hover:bg-gray-800 eyecare:hover:bg-[#f4ebd8] hover:shadow-sm transition-all duration-200 active:scale-95"

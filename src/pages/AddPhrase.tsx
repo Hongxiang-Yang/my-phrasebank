@@ -1,10 +1,13 @@
 import { useState, useEffect } from 'react';
 import type { FormEvent } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import { Storage } from '../lib/storage';
 import type { Phrase, Settings } from '../types';
 import { generatePhraseDetails } from '../lib/gemini';
 
 export function AddPhrase() {
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const [settings, setSettings] = useState<Settings | null>(null);
   const [phrase, setPhrase] = useState('');
   const [definition, setDefinition] = useState('');
@@ -27,7 +30,22 @@ export function AddPhrase() {
   useEffect(() => {
     const s = Storage.getSettings();
     setSettings(s);
-  }, []);
+    
+    if (id) {
+      const existingPhrase = Storage.getPhrases().find(p => p.id === id);
+      if (existingPhrase) {
+        setPhrase(existingPhrase.phrase);
+        setDefinition(existingPhrase.definition || '');
+        setChineseCategory(existingPhrase.chineseCategory);
+        setChineseNote(existingPhrase.chineseNote || '');
+        setUsageType(existingPhrase.usageType || '');
+        setTone(existingPhrase.tone || '');
+        setTagsInput(existingPhrase.tags.join(', '));
+        setExamples(existingPhrase.examples || []);
+        setScenarios(existingPhrase.scenarios || []);
+      }
+    }
+  }, [id]);
 
   const handleGenerate = async () => {
     if (!phrase) {
@@ -54,7 +72,7 @@ export function AddPhrase() {
     if (!phrase || !finalCategory) return;
 
     const newPhrase: Phrase = {
-      id: crypto.randomUUID(),
+      id: id || crypto.randomUUID(),
       phrase,
       definition: definition || undefined,
       chineseCategory: finalCategory,
@@ -64,12 +82,16 @@ export function AddPhrase() {
       tags: tagsInput.split(',').map(t => t.trim()).filter(Boolean),
       examples,
       scenarios,
-      createdAt: new Date().toISOString(),
+      createdAt: id ? (Storage.getPhrases().find(p => p.id === id)?.createdAt || new Date().toISOString()) : new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
 
     const existingPhrases = Storage.getPhrases();
-    Storage.savePhrases([newPhrase, ...existingPhrases]);
+    if (id) {
+      Storage.savePhrases(existingPhrases.map(p => p.id === id ? newPhrase : p));
+    } else {
+      Storage.savePhrases([newPhrase, ...existingPhrases]);
+    }
 
     if (settings && !settings.categories.some(c => c.nameZh === finalCategory)) {
       const updatedSettings = { ...settings };
@@ -82,17 +104,21 @@ export function AddPhrase() {
       setSettings(updatedSettings);
     }
 
-    setIsSaved(true);
-    setPhrase('');
-    setDefinition('');
-    setTagsInput('');
-    setChineseNote('');
-    setExamples([]);
-    setScenarios([]);
-    setIsNewCategory(false);
-    setNewCategoryName('');
-    
-    setTimeout(() => setIsSaved(false), 3000);
+    if (id) {
+      navigate('/browse');
+    } else {
+      setIsSaved(true);
+      setPhrase('');
+      setDefinition('');
+      setTagsInput('');
+      setChineseNote('');
+      setExamples([]);
+      setScenarios([]);
+      setIsNewCategory(false);
+      setNewCategoryName('');
+      
+      setTimeout(() => setIsSaved(false), 3000);
+    }
   };
 
   if (!settings) return null;
@@ -105,9 +131,9 @@ export function AddPhrase() {
       <div className="p-6 md:p-10 max-w-3xl mx-auto relative z-10">
         <div className="flex flex-col gap-2 mb-8">
           <h1 className="text-3xl md:text-4xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400 eyecare:from-[#8b5a2b] eyecare:to-[#6a421a] tracking-tight transition-colors">
-            Add New Phrase
+            {id ? 'Edit Phrase' : 'Add New Phrase'}
           </h1>
-          <p className="text-gray-500 dark:text-gray-400 eyecare:text-[#7a6b56] text-sm transition-colors">Expand your personal vocabulary bank.</p>
+          <p className="text-gray-500 dark:text-gray-400 eyecare:text-[#7a6b56] text-sm transition-colors">{id ? 'Update your phrase details below.' : 'Expand your personal vocabulary bank.'}</p>
         </div>
       
       {isSaved && (
@@ -262,7 +288,7 @@ export function AddPhrase() {
             <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out"></div>
             <span className="relative flex items-center gap-2">
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
-              Save Phrase
+              {id ? 'Update Phrase' : 'Save Phrase'}
             </span>
           </button>
         </div>

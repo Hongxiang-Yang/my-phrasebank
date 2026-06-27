@@ -12,6 +12,7 @@ function App() {
         <Route path="/" element={<Layout />}>
           <Route index element={<Home />} />
           <Route path="add" element={<AddPhrase />} />
+          <Route path="edit/:id" element={<AddPhrase />} />
           <Route path="browse" element={<CategoryBrowser />} />
           <Route path="settings" element={<SettingsPage />} />
         </Route>
