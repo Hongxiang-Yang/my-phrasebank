@@ -49,7 +49,8 @@ export async function extractPhrasesFromText(textToAnalyze: string, existingPhra
   }
 
   const prompt = `You are an expert academic English teacher. 
-Extract 3 to 8 high-quality, highly reusable academic phrases or collocations from the text below. 
+Extract ALL highly reusable academic phrases, collocations, transition words, structural signposts, and sentence starters from the text below. 
+Do NOT limit the quantity. Be exhaustive! It is critical that you find ALL structural connectors (e.g., "To make this argument", "From this position", "As touched on earlier", "To account for").
 Exclude any phrases that are exactly identical or very similar to these existing ones: ${JSON.stringify(existingPhrases)}.
 
 For each extracted phrase, provide:
@@ -104,4 +105,56 @@ ${textToAnalyze}
   }
 
   return JSON.parse(text) as any[];
+}
+
+export async function autoRecategorizePhrases(phrases: { id: string, phrase: string, definition?: string, currentCategory: string }[]) {
+  const settings = Storage.getSettings();
+  if (!settings.geminiApiKey) {
+    throw new Error('API Key not found. Please set your Gemini API Key in Settings.');
+  }
+
+  const prompt = `You are an expert academic linguist helping to organize a personal phrase bank.
+Here is a list of phrases the user has collected. Currently, they might be in messy or poorly named categories.
+Your task is to completely redesign the category system for these phrases to make it logical, intuitive, and highly useful for academic writing.
+
+Create a set of robust Chinese categories (e.g. "引入观点", "过渡与承接", "举例说明", "描述数据", "总结与结论" etc.).
+Then, assign each phrase to exactly one of these new categories.
+
+Input Phrases:
+${JSON.stringify(phrases)}
+
+Return the output as a valid JSON object exactly matching this format:
+{
+  "newCategories": [
+    {"nameZh": "...", "order": 0},
+    {"nameZh": "...", "order": 1}
+  ],
+  "mappings": [
+    {"id": "...", "newCategory": "..."}
+  ]
+}`;
+
+  const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${settings.geminiApiKey}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      contents: [{ parts: [{ text: prompt }] }],
+      generationConfig: {
+        responseMimeType: 'application/json',
+      }
+    })
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => null);
+    throw new Error(errorData?.error?.message || 'Failed to fetch from Gemini API');
+  }
+
+  const data = await response.json();
+  const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+  if (!text) {
+    throw new Error('No valid response from AI');
+  }
+
+  return JSON.parse(text) as { newCategories: {nameZh: string, order: number}[], mappings: {id: string, newCategory: string}[] };
 }

@@ -1,28 +1,29 @@
 import { useState, useEffect } from 'react';
 import { Storage } from '../lib/storage';
 import type { Phrase, Settings } from '../types';
-import { Copy, ChevronDown, ChevronUp, Trash2, Edit } from 'lucide-react';
+import { Copy, ChevronDown, ChevronUp, Trash2, Edit, Sparkles, Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { autoRecategorizePhrases } from '../lib/gemini';
 
 export function CategoryBrowser() {
   const [settings, setSettings] = useState<Settings | null>(null);
   const [phrases, setPhrases] = useState<Phrase[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState<string>('');
+  const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [isRecategorizing, setIsRecategorizing] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
     const s = Storage.getSettings();
     setSettings(s);
-    if (s.categories.length > 0) {
-      setSelectedCategory(s.categories[0].nameZh);
-    }
     setPhrases(Storage.getPhrases());
   }, []);
 
   if (!settings) return null;
 
-  const filteredPhrases = phrases.filter(p => p.chineseCategory === selectedCategory);
+  const filteredPhrases = selectedCategory === 'All' 
+    ? phrases 
+    : phrases.filter(p => p.chineseCategory === selectedCategory);
 
   const handleCopy = (text: string) => {
     navigator.clipboard.writeText(text);
@@ -33,6 +34,57 @@ export function CategoryBrowser() {
       const newPhrases = phrases.filter(p => p.id !== id);
       Storage.savePhrases(newPhrases);
       setPhrases(newPhrases);
+    }
+  };
+
+  const handleAutoRecategorize = async () => {
+    if (phrases.length === 0) {
+      alert("You don't have any phrases to categorize yet!");
+      return;
+    }
+    if (!confirm('This will completely redesign your categories and update all phrases. Are you sure you want to proceed?')) {
+      return;
+    }
+
+    setIsRecategorizing(true);
+    try {
+      const phrasesData = phrases.map(p => ({
+        id: p.id,
+        phrase: p.phrase,
+        definition: p.definition,
+        currentCategory: p.chineseCategory
+      }));
+      
+      const { newCategories, mappings } = await autoRecategorizePhrases(phrasesData);
+      
+      // Update Settings
+      const updatedSettings = {
+        ...settings,
+        categories: newCategories.map(c => ({
+          id: crypto.randomUUID(),
+          nameZh: c.nameZh,
+          order: c.order
+        }))
+      };
+      Storage.saveSettings(updatedSettings);
+      setSettings(updatedSettings);
+
+      // Update Phrases
+      const updatedPhrases = phrases.map(p => {
+        const mapping = mappings.find(m => m.id === p.id);
+        if (mapping) {
+          return { ...p, chineseCategory: mapping.newCategory };
+        }
+        return p;
+      });
+      Storage.savePhrases(updatedPhrases);
+      setPhrases(updatedPhrases);
+      setSelectedCategory('All');
+      
+    } catch (err: any) {
+      alert('Failed to re-categorize: ' + err.message);
+    } finally {
+      setIsRecategorizing(false);
     }
   };
 
@@ -47,7 +99,17 @@ export function CategoryBrowser() {
             </div>
             <h2 className="text-sm font-bold text-gray-800 dark:text-gray-100 eyecare:text-[#433422] uppercase tracking-widest transition-colors">Categories</h2>
           </div>
-          <div className="space-y-1.5">
+          <div className="space-y-1.5 flex-1">
+            <button
+              onClick={() => setSelectedCategory('All')}
+              className={`w-full text-left px-4 py-3 rounded-xl text-sm transition-all duration-200 font-medium ${
+                selectedCategory === 'All'
+                  ? 'bg-indigo-50 dark:bg-indigo-900/30 eyecare:bg-[#e8dec7] text-indigo-700 dark:text-indigo-300 eyecare:text-[#5c3a21] shadow-sm ring-1 ring-indigo-500/10 dark:ring-indigo-400/20 eyecare:ring-[#8b5a2b]/20 transform scale-[1.02]'
+                  : 'text-gray-600 dark:text-gray-400 eyecare:text-[#8a7b66] hover:bg-gray-100/80 dark:hover:bg-gray-700/50 eyecare:hover:bg-[#e8dec7]/50 hover:text-gray-900 dark:hover:text-gray-200 eyecare:hover:text-[#433422]'
+              }`}
+            >
+              All Phrases
+            </button>
             {settings.categories.map(cat => (
               <button
                 key={cat.id}
@@ -62,6 +124,21 @@ export function CategoryBrowser() {
               </button>
             ))}
           </div>
+
+          <div className="mt-8 pt-6 border-t border-gray-200/60 dark:border-gray-700/60 eyecare:border-[#e6d5b8]/60">
+            <button 
+              onClick={handleAutoRecategorize}
+              disabled={isRecategorizing}
+              className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-bold bg-gradient-to-r from-indigo-500 to-purple-600 dark:from-indigo-600 dark:to-purple-700 eyecare:from-[#8b5a2b] eyecare:to-[#6a421a] text-white shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200 disabled:opacity-50 disabled:transform-none disabled:cursor-not-allowed"
+            >
+              {isRecategorizing ? (
+                <><Loader2 size={16} className="animate-spin" /> Analyzing...</>
+              ) : (
+                <><Sparkles size={16} /> Auto Re-categorize</>
+              )}
+            </button>
+            <p className="text-[10px] text-gray-500 dark:text-gray-400 eyecare:text-[#8a7b66] mt-3 text-center transition-colors">Let AI redesign your categories.</p>
+          </div>
         </div>
       </div>
       
@@ -73,6 +150,7 @@ export function CategoryBrowser() {
             onChange={(e) => setSelectedCategory(e.target.value)}
             className="w-full p-3 pl-4 pr-10 border border-gray-200 dark:border-gray-600 eyecare:border-[#e6d5b8] rounded-xl bg-white/50 dark:bg-gray-700/50 eyecare:bg-[#fbf8f1]/50 backdrop-blur-sm focus:ring-2 focus:ring-indigo-500/50 dark:focus:ring-indigo-500/50 eyecare:focus:ring-[#8b5a2b]/50 appearance-none font-medium text-gray-700 dark:text-gray-200 eyecare:text-[#433422] shadow-sm transition-colors outline-none"
           >
+          <option value="All">All Phrases</option>
           {settings.categories.map(cat => (
             <option key={cat.id} value={cat.nameZh}>{cat.nameZh}</option>
           ))}
