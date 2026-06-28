@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Layout } from './components/Layout';
 import { Home } from './pages/Home';
 import { AddPhrase } from './pages/AddPhrase';
+import { Discover } from './pages/Discover';
 import { CategoryBrowser } from './pages/CategoryBrowser';
 import { SettingsPage } from './pages/Settings';
 
@@ -13,6 +14,7 @@ function App() {
           <Route index element={<Home />} />
           <Route path="add" element={<AddPhrase />} />
           <Route path="edit/:id" element={<AddPhrase />} />
+          <Route path="discover" element={<Discover />} />
           <Route path="browse" element={<CategoryBrowser />} />
           <Route path="settings" element={<SettingsPage />} />
         </Route>

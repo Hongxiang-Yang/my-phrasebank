@@ -1,5 +1,5 @@
 import { Outlet, Link, useLocation } from 'react-router-dom';
-import { Home, PlusCircle, LayoutGrid, Settings } from 'lucide-react';
+import { Home, PlusCircle, LayoutGrid, Settings, Sparkles } from 'lucide-react';
 
 export function Layout() {
   const location = useLocation();
@@ -7,6 +7,7 @@ export function Layout() {
   const navItems = [
     { path: '/', label: 'Home', icon: <Home size={20} /> },
     { path: '/add', label: 'Add Phrase', icon: <PlusCircle size={20} /> },
+    { path: '/discover', label: 'Discover', icon: <Sparkles size={20} /> },
     { path: '/browse', label: 'Categories', icon: <LayoutGrid size={20} /> },
     { path: '/settings', label: 'Settings', icon: <Settings size={20} /> },
   ];
