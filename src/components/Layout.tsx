@@ -31,7 +31,7 @@ export function Layout() {
                 className={cn(
                   "flex flex-col md:flex-row items-center gap-1 md:gap-3 p-3 md:px-4 md:py-3 rounded-none md:rounded-xl transition-colors duration-200",
                   isActive 
-                    ? "text-accent md:bg-accent/10 font-medium" 
+                    ? "text-foreground md:bg-accent font-medium" 
                     : "text-muted-foreground hover:text-foreground md:hover:bg-muted"
                 )}
               >
