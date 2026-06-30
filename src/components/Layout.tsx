@@ -44,7 +44,7 @@ export function Layout() {
       </nav>
 
       {/* Main Content Area */}
-      <main className="flex-1 overflow-y-auto pb-20 md:pb-0 bg-background">
+      <main className="flex-1 overflow-y-auto scrollbar-hide pb-20 md:pb-0 bg-background">
         <Outlet />
       </main>
     </div>

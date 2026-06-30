@@ -94,7 +94,7 @@ export function CategoryBrowser() {
   return (
     <div className="flex flex-col md:flex-row h-[calc(100vh-64px)] md:h-screen bg-background text-foreground">
       {/* Category Sidebar */}
-      <div className="w-full md:w-72 bg-card border-r border-border overflow-y-auto shrink-0 hidden md:flex flex-col relative z-10">
+      <div className="w-full md:w-72 bg-card border-r border-border overflow-y-auto scrollbar-hide shrink-0 hidden md:flex flex-col relative z-10">
         <div className="p-6 flex-1 flex flex-col">
           <div className="flex items-center gap-2 mb-6">
             <div className="w-8 h-8 rounded-lg bg-primary text-primary-foreground flex items-center justify-center shadow-sm">
@@ -165,7 +165,7 @@ export function CategoryBrowser() {
       </div>
 
       {/* Phrases List */}
-      <div className="flex-1 overflow-y-auto p-4 md:p-10 bg-muted/20 pb-24 md:pb-10 relative">
+      <div className="flex-1 overflow-y-auto scrollbar-hide p-4 md:p-10 bg-muted/20 pb-24 md:pb-10 relative">
         <div className="max-w-6xl mx-auto w-full">
           <div className="hidden md:flex items-center gap-3 mb-8">
             <h1 className="text-3xl font-extrabold tracking-tight">{selectedCategory}</h1>
