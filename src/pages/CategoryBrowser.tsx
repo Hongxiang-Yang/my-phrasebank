@@ -92,86 +92,85 @@ export function CategoryBrowser() {
   };
 
   return (
-    <div className="p-4 md:p-10 max-w-6xl mx-auto w-full h-[calc(100vh-64px)] md:h-screen">
-      <div className="flex flex-col md:flex-row h-full bg-background text-foreground rounded-none md:rounded-2xl overflow-hidden border border-border shadow-sm">
-        {/* Category Sidebar */}
-        <div className="w-full md:w-72 bg-card border-r border-border overflow-y-auto shrink-0 hidden md:flex flex-col relative z-10">
-          <div className="p-6 flex-1 flex flex-col">
-            <div className="flex items-center gap-2 mb-6">
-              <div className="w-8 h-8 rounded-lg bg-primary text-primary-foreground flex items-center justify-center shadow-sm">
-                <Filter size={16} strokeWidth={2.5} />
-              </div>
-              <h2 className="text-sm font-bold uppercase tracking-widest text-muted-foreground">Categories</h2>
+    <div className="flex flex-col md:flex-row h-[calc(100vh-64px)] md:h-screen bg-background text-foreground">
+      {/* Category Sidebar */}
+      <div className="w-full md:w-72 bg-card border-r border-border overflow-y-auto shrink-0 hidden md:flex flex-col relative z-10">
+        <div className="p-6 flex-1 flex flex-col">
+          <div className="flex items-center gap-2 mb-6">
+            <div className="w-8 h-8 rounded-lg bg-primary text-primary-foreground flex items-center justify-center shadow-sm">
+              <Filter size={16} strokeWidth={2.5} />
             </div>
-            <div className="space-y-1.5 flex-1">
+            <h2 className="text-sm font-bold uppercase tracking-widest text-muted-foreground">Categories</h2>
+          </div>
+          <div className="space-y-1.5 flex-1">
+            <button
+              onClick={() => setSelectedCategory('All')}
+              className={`w-full text-left px-4 py-3 rounded-xl text-sm font-medium transition-colors ${
+                selectedCategory === 'All'
+                  ? 'bg-accent text-accent-foreground shadow-sm'
+                  : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+              }`}
+            >
+              All Phrases
+            </button>
+            {settings.categories.map(cat => (
               <button
-                onClick={() => setSelectedCategory('All')}
+                key={cat.id}
+                onClick={() => setSelectedCategory(cat.nameZh)}
                 className={`w-full text-left px-4 py-3 rounded-xl text-sm font-medium transition-colors ${
-                  selectedCategory === 'All'
+                  selectedCategory === cat.nameZh
                     ? 'bg-accent text-accent-foreground shadow-sm'
                     : 'text-muted-foreground hover:bg-muted hover:text-foreground'
                 }`}
               >
-                All Phrases
+                {cat.nameZh}
               </button>
-              {settings.categories.map(cat => (
-                <button
-                  key={cat.id}
-                  onClick={() => setSelectedCategory(cat.nameZh)}
-                  className={`w-full text-left px-4 py-3 rounded-xl text-sm font-medium transition-colors ${
-                    selectedCategory === cat.nameZh
-                      ? 'bg-accent text-accent-foreground shadow-sm'
-                      : 'text-muted-foreground hover:bg-muted hover:text-foreground'
-                  }`}
-                >
-                  {cat.nameZh}
-                </button>
-              ))}
-            </div>
-
-            <div className="mt-8 pt-6 border-t border-border">
-              <Button 
-                onClick={handleAutoRecategorize}
-                disabled={isRecategorizing}
-                className="w-full font-bold shadow-md"
-              >
-                {isRecategorizing ? (
-                  <><Loader2 size={16} className="mr-2 animate-spin" /> Analyzing...</>
-                ) : (
-                  <><Sparkles size={16} className="mr-2" /> Auto Re-categorize</>
-                )}
-              </Button>
-              <p className="text-[10px] text-muted-foreground mt-3 text-center">Let AI redesign your categories.</p>
-            </div>
+            ))}
           </div>
-        </div>
-        
-        {/* Mobile Category Select */}
-        <div className="md:hidden p-4 border-b border-border bg-card/90 backdrop-blur-md shrink-0 sticky top-0 z-20">
-          <div className="relative">
-            <select 
-              value={selectedCategory}
-              onChange={(e) => setSelectedCategory(e.target.value)}
-              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring appearance-none"
+
+          <div className="mt-8 pt-6 border-t border-border">
+            <Button 
+              onClick={handleAutoRecategorize}
+              disabled={isRecategorizing}
+              className="w-full font-bold shadow-md"
             >
-              <option value="All">All Phrases</option>
-              {settings.categories.map(cat => (
-                <option key={cat.id} value={cat.nameZh}>{cat.nameZh}</option>
-              ))}
-            </select>
-            <div className="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none text-muted-foreground">
-              <ChevronDown size={16} />
-            </div>
+              {isRecategorizing ? (
+                <><Loader2 size={16} className="mr-2 animate-spin" /> Analyzing...</>
+              ) : (
+                <><Sparkles size={16} className="mr-2" /> Auto Re-categorize</>
+              )}
+            </Button>
+            <p className="text-[10px] text-muted-foreground mt-3 text-center">Let AI redesign your categories.</p>
           </div>
         </div>
+      </div>
+      
+      {/* Mobile Category Select */}
+      <div className="md:hidden p-4 border-b border-border bg-card/90 backdrop-blur-md shrink-0 sticky top-0 z-20">
+        <div className="relative">
+          <select 
+            value={selectedCategory}
+            onChange={(e) => setSelectedCategory(e.target.value)}
+            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring appearance-none"
+          >
+            <option value="All">All Phrases</option>
+            {settings.categories.map(cat => (
+              <option key={cat.id} value={cat.nameZh}>{cat.nameZh}</option>
+            ))}
+          </select>
+          <div className="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none text-muted-foreground">
+            <ChevronDown size={16} />
+          </div>
+        </div>
+      </div>
 
-        {/* Phrases List */}
-        <div className="flex-1 overflow-y-auto p-4 md:p-10 bg-muted/20 pb-24 md:pb-10 relative">
-          <div className="max-w-4xl mx-auto xl:mx-0">
-            <div className="hidden md:flex items-center gap-3 mb-8">
-              <h1 className="text-3xl font-extrabold tracking-tight">{selectedCategory}</h1>
-              <Badge variant="secondary" className="text-sm font-bold">{filteredPhrases.length}</Badge>
-            </div>
+      {/* Phrases List */}
+      <div className="flex-1 overflow-y-auto p-4 md:p-10 bg-muted/20 pb-24 md:pb-10 relative">
+        <div className="max-w-6xl mx-auto w-full">
+          <div className="hidden md:flex items-center gap-3 mb-8">
+            <h1 className="text-3xl font-extrabold tracking-tight">{selectedCategory}</h1>
+            <Badge variant="secondary" className="text-sm font-bold">{filteredPhrases.length}</Badge>
+          </div>
           
           {filteredPhrases.length === 0 ? (
             <div className="text-center py-16 px-6 border border-dashed border-border rounded-2xl bg-card">
@@ -263,7 +262,6 @@ export function CategoryBrowser() {
               ))}
             </div>
           )}
-          </div>
         </div>
       </div>
     </div>
