@@ -1,21 +1,102 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap');
 @import "tailwindcss";
 
-@custom-variant dark (&:where(.dark, .dark *));
-@custom-variant eyecare (&:where(.eyecare, .eyecare *));
-
-:root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
-
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #f9fafb; /* light bg */
+@theme {
+  --font-sans: 'Plus Jakarta Sans', system-ui, sans-serif;
+  
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --radius-md: var(--radius);
+  --radius-sm: calc(var(--radius) - 2px);
+  --radius-lg: calc(var(--radius) + 2px);
 }
 
-@media (prefers-color-scheme: light) {
+@layer base {
   :root {
-    color: #111827;
-    background-color: #f9fafb;
+    --background: #FAFAFA;
+    --foreground: #09090B;
+    --border: #E4E4E7;
+    --input: #E4E4E7;
+    --ring: #18181B;
+    --primary: #18181B;
+    --primary-foreground: #FFFFFF;
+    --secondary: #E8ECF0;
+    --secondary-foreground: #09090B;
+    --accent: #2563EB;
+    --accent-foreground: #FFFFFF;
+    --muted: #F4F4F5;
+    --muted-foreground: #71717A;
+    --card: #FFFFFF;
+    --card-foreground: #09090B;
+    --destructive: #DC2626;
+    --destructive-foreground: #FFFFFF;
+    --radius: 0.75rem;
   }
+  .dark {
+    --background: #09090B;
+    --foreground: #FAFAFA;
+    --border: #27272A;
+    --input: #27272A;
+    --ring: #FAFAFA;
+    --primary: #FAFAFA;
+    --primary-foreground: #09090B;
+    --secondary: #27272A;
+    --secondary-foreground: #FAFAFA;
+    --accent: #3B82F6;
+    --accent-foreground: #FFFFFF;
+    --muted: #27272A;
+    --muted-foreground: #A1A1AA;
+    --card: #18181B;
+    --card-foreground: #FAFAFA;
+    --destructive: #EF4444;
+    --destructive-foreground: #FAFAFA;
+  }
+  .eyecare {
+    --background: #fbf8f1;
+    --foreground: #433422;
+    --border: #e6d5b8;
+    --input: #e6d5b8;
+    --ring: #8b5a2b;
+    --primary: #8b5a2b;
+    --primary-foreground: #fbf8f1;
+    --secondary: #f4ebd8;
+    --secondary-foreground: #433422;
+    --accent: #8b5a2b;
+    --accent-foreground: #fbf8f1;
+    --muted: #f4ebd8;
+    --muted-foreground: #8a7b66;
+    --card: #fbf8f1;
+    --card-foreground: #433422;
+    --destructive: #b91c1c;
+    --destructive-foreground: #fbf8f1;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+.bg-dot-pattern {
+  background-image: radial-gradient(var(--border) 1px, transparent 1px);
+  background-size: 24px 24px;
 }
