@@ -145,7 +145,7 @@ export function Discover() {
 
   return (
     <div className="relative min-h-screen pb-24">
-      <div className="p-6 md:p-10 max-w-4xl relative z-10">
+      <div className="p-6 md:p-10 max-w-5xl mx-auto w-full relative z-10">
         <div className="flex flex-col gap-2 mb-8">
           <h1 className="text-3xl md:text-4xl font-extrabold text-foreground tracking-tight">
             Discover Phrases

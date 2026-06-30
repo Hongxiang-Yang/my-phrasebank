@@ -166,7 +166,7 @@ export function CategoryBrowser() {
 
       {/* Phrases List */}
       <div className="flex-1 overflow-y-auto p-4 md:p-10 bg-muted/20 pb-24 md:pb-10 relative">
-        <div className="max-w-4xl mx-auto xl:mx-0 xl:pr-8">
+        <div className="max-w-6xl mx-auto w-full">
           <div className="hidden md:flex items-center gap-3 mb-8">
             <h1 className="text-3xl font-extrabold tracking-tight">{selectedCategory}</h1>
             <Badge variant="secondary" className="text-sm font-bold">{filteredPhrases.length}</Badge>

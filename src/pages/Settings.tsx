@@ -33,7 +33,7 @@ export function SettingsPage() {
   if (!settings) return null;
 
   return (
-    <div className="p-6 md:p-10 max-w-2xl">
+    <div className="p-6 md:p-10 max-w-4xl mx-auto w-full">
       <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight mb-8">Settings</h1>
       
       {saved && (

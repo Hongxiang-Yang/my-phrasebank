@@ -21,7 +21,7 @@ export function Home() {
       {/* Background Pattern */}
       <div className="absolute inset-0 bg-dot-pattern opacity-50 pointer-events-none" />
       
-      <div className="relative z-10 p-6 md:p-10 max-w-5xl">
+      <div className="relative z-10 p-6 md:p-10 max-w-6xl mx-auto w-full">
         <div className="flex flex-col gap-2 mb-10">
           <h1 className="text-3xl md:text-4xl font-extrabold text-foreground tracking-tight">
             Dashboard

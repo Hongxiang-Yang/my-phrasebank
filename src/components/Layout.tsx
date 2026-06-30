@@ -18,7 +18,7 @@ export function Layout() {
       {/* Sidebar for Desktop / Bottom Nav for Mobile */}
       <nav className="fixed bottom-0 w-full bg-card border-t border-border md:relative md:w-64 md:border-t-0 md:border-r flex md:flex-col justify-around md:justify-start z-10">
         <div className="hidden md:flex p-6 items-center gap-3 border-b border-border">
-          <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-primary-foreground font-bold shadow-sm">P</div>
+          <img src="/favicon.png" alt="Logo" className="w-8 h-8 rounded-lg shadow-sm" />
           <h1 className="text-xl font-semibold tracking-tight text-foreground">My Phrasebank</h1>
         </div>
         <div className="flex w-full justify-around md:flex-col md:p-4 md:gap-2">
